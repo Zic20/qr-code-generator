@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { toast } from "react-toastify";
 
 const LinkForm = ({ submitHandler }) => {
   const urlRef = useRef();
@@ -11,7 +12,7 @@ const LinkForm = ({ submitHandler }) => {
       sizeRef.current.value === "" ||
       nameRef.current.value === ""
     )
-      alert("Please provide all necessary information");
+      toast.error("Please provide all necessary information");
     submitHandler({
       url: urlRef.current.value,
       size: sizeRef.current.value,

@@ -13,3 +13,7 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+
+body {
+  background: linear-gradient(133deg, #F6F6F6 49.46%, #DFF7F1 87.57%);
+}
