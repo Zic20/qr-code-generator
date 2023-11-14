@@ -21,6 +21,10 @@ const router = createBrowserRouter([
     path: "/forgotpassword",
     element: <ForgotPassword />,
   },
+  // {
+  //   path: "/links",
+  //   element: <ImagesLinks />,
+  // },
   {
     path: "/*",
     element: <Home />,

@@ -1,17 +1,19 @@
 import { useNavigate } from "react-router";
 import { useAuth } from "../firebase/auth";
 import { getAuth, signOut } from "firebase/auth";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
-  const { authUser } = useAuth();
+  const { authUser, logout } = useAuth();
   const navigate = useNavigate();
   const onLogoutHandler = async () => {
     const auth = getAuth();
     try {
       await signOut(auth);
+      logout();
       navigate("/signin");
     } catch (error) {
-      // console.log(error);
+      toast.error("Sign out failed.");
     }
   };
   return (

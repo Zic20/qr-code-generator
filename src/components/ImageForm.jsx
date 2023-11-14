@@ -1,23 +1,42 @@
 import { useRef } from "react";
 import { toast } from "react-toastify";
+import { storeImage } from "../modules/storeImage";
+import { auth, db } from "../firebase/firebase";
+import { addDoc, serverTimestamp, collection } from "firebase/firestore";
+import { useAuth } from "../firebase/auth";
 
-const LinkForm = ({ submitHandler }) => {
-  const urlRef = useRef();
+const ImageForm = ({ submitHandler }) => {
+  const imageRef = useRef();
   const sizeRef = useRef();
   const nameRef = useRef();
-  const onSubmitHandler = (event) => {
+  const authUser = useAuth();
+  const onSubmitHandler = async (event) => {
     event.preventDefault();
-    if (
-      urlRef.current.value.trim() === "" ||
-      sizeRef.current.value === "" ||
-      nameRef.current.value === ""
-    )
+    const imageInput = document.getElementById("image");
+    const size = sizeRef.current.value;
+    const name = nameRef.current.value;
+
+    if (name === "" || size === "" || imageInput.files.length === 0) {
       toast.error("Please provide all necessary information");
-    submitHandler({
-      url: urlRef.current.value,
-      size: sizeRef.current.value,
-      name: nameRef.current.value,
+      return;
+    }
+    const image = imageInput.files[0];
+    const imageURL = storeImage(image).catch(() => {
+      toast.error("Could not upload image");
+      return;
     });
+
+    const downloadURL = await imageURL;
+    const data = {
+      name,
+      url: downloadURL,
+      user: auth.currentUser.uid,
+      timestamp: serverTimestamp(),
+    };
+
+    await addDoc(collection(db, "files"), data);
+
+    submitHandler({ name, size, url: downloadURL });
   };
   return (
     <form className={"p-5 space-y-2 w-full  card"} onSubmit={onSubmitHandler}>
@@ -33,11 +52,12 @@ const LinkForm = ({ submitHandler }) => {
         </div>
         <div className="mb-2">
           <input
-            type="url"
-            id="link"
-            ref={urlRef}
+            type="file"
+            id="image"
+            ref={imageRef}
             className="mt-2 w-full border border-gray-800 rounded-sm p-2 bg-white"
-            placeholder="Enter a url"
+            multiple={false}
+            accept="image/*"
           />
         </div>
 
@@ -59,13 +79,18 @@ const LinkForm = ({ submitHandler }) => {
             <option value="700">700x700</option>
           </select>
         </div>
-
-        <button className="text-white bg-black p-2 rounded-sm w-full md:w-6/12 mx-auto block">
-          Generate QR Code
-        </button>
+        {auth.currentUser ? (
+          <button className="text-white bg-black p-2 rounded-sm w-full md:w-6/12 mx-auto block">
+            Generate QR Code
+          </button>
+        ) : (
+          <p className="text-center font-semibold ">
+            Please sign in to generate QR Code for images.
+          </p>
+        )}
       </div>
     </form>
   );
 };
 
-export default LinkForm;
+export default ImageForm;

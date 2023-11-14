@@ -1,7 +1,10 @@
-import { QRCodeCanvas } from "qrcode.react";
 import LinkForm from "../components/LinkForm";
+import ImageForm from "../components/ImageForm";
 import { useState } from "react";
 import Navbar from "../components/Navbar";
+import QrGenerator from "../components/QrGenerator";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
 
 const Home = () => {
   const [url, setUrl] = useState("");
@@ -12,17 +15,6 @@ const Home = () => {
     setUrl(url);
     setQrCodeSize(size);
     setFileName(name);
-  };
-
-  const handleDownloadClick = () => {
-    const canvas = document.querySelector("canvas");
-    const image = canvas.toDataURL("image/png");
-    const link = document.createElement("a");
-    link.href = image;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
   return (
     <>
@@ -42,29 +34,26 @@ const Home = () => {
               Add your url or image and generate QR Code.
             </p>
           </div>
-          <LinkForm submitHandler={onFormSubmitHandler} />
+          <Tabs>
+            <TabList>
+              <Tab>Generate QR Code for Website</Tab>
+              <Tab>Generate QR Code for Images</Tab>
+            </TabList>
+            <TabPanel>
+              <LinkForm submitHandler={onFormSubmitHandler} />
+            </TabPanel>
+            <TabPanel>
+              <ImageForm submitHandler={onFormSubmitHandler} />
+            </TabPanel>
+          </Tabs>
         </div>
         <div className="flex-1 w-full my-5 p-10">
           {url && (
-            <>
-              <QRCodeCanvas
-                className="block mx-auto mb-5"
-                value={url}
-                size={qrCodeSize}
-                bgColor={""}
-                fgColor={"#ffffff"}
-                level={"H"}
-                includeMargin={false}
-                style={{ width: "80%", height: "80%" }}
-              />
-
-              <button
-                onClick={handleDownloadClick}
-                className="text-white bg-black p-2 rounded-sm w-6/12 mx-auto block"
-              >
-                Download QR Code
-              </button>
-            </>
+            <QrGenerator
+              url={url}
+              fileName={fileName}
+              qrCodeSize={qrCodeSize}
+            />
           )}
         </div>
       </div>
