@@ -57,7 +57,7 @@ const ImageForm = ({ submitHandler }) => {
             ref={imageRef}
             className="mt-2 w-full border border-gray-800 rounded-sm p-2 bg-white"
             multiple={false}
-            accept="image/*"
+            accept="*"
           />
         </div>
 
